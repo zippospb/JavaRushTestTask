@@ -1,0 +1,124 @@
+<!DOCTYPE HTML>
+<html lang="ru"
+      xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorator="default">
+<head>
+    <title>List Book</title>
+    <meta charset="UTF-8">
+    <link layout:fragment="pageStyleLink" rel="stylesheet" th:href="@{'/css/list.css'}" />
+</head>
+<body>
+
+<section class="jumbotron text-center" layout:fragment="pageHead" style="text-align: center;">
+    <div class="container">
+        <h1 class="jumbotron-heading">Книжная полка</h1>
+        <p class="lead text-muted">Проект созданный в рамках тестового задания онлайн курса Java - <a href="https://javarush.ru">JavaRush</a>, для прохождения стажировки.</p>
+    </div>
+</section>
+<li class="nav-item" style="text-align: center" layout:fragment="newBook">
+    <a class="nav-item nav-link" th:href="@{'/books/add'}">Добавить новую книгу</a>
+</li>
+<table border="0">
+    <tbody>
+    <tr style="width: 80%; text-align: center;">
+        <form th:fragment="search (term)" id="data" class="form-inline my-2 my-lg-0" th:action="@{'/books'}">
+            <input th:value="${term} ? ${term} : ''" class="form-control" type="search" name="term" placeholder="поиск..." aria-label="Search" style="width: 90%;"/>
+            <button class="btn btn-link my-2 my-sm-0" type="submit">
+                <svg class="navbar-nav-svg" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 16 16" version="1.1" aria-hidden="true" whidth="16" height="16">
+                    <path fill-rule="evenodd" d="M15.7 13.3l-3.81-3.83A5.93 5.93 0 0 0 13 6c0-3.31-2.69-6-6-6S1 2.69 1 6s2.69 6 6 6c1.3 0 2.48-.41 3.47-1.11l3.83 3.81c.19.2.45.3.7.3.25 0 .52-.09.7-.3a.996.996 0 0 0 0-1.41v.01zM7 10.7c-2.59 0-4.7-2.11-4.7-4.7 0-2.59 2.11-4.7 4.7-4.7 2.59 0 4.7 2.11 4.7 4.7 0 2.59-2.11 4.7-4.7 4.7z"></path>
+                </svg>
+            </button>
+        </form>
+    </tr>
+    <tr style="width: 80%; text-aling: left; padding-left: 20%">
+        <div class ="container">
+            <div class="d-flex flex-column flex-md-row align-items-center mb-3" style="text-aling:center">
+                <div class="mr-auto">
+                    <div class="form-row">
+                        <div class="form-inline" style="text-align: left; padding-left: 30%;">
+                            <table>
+                                <tr>
+                                    <td>
+                                        <div th:fragment="ready (ready)" class="form-group mr-3">
+                                            <label for="ready" class="col-form-label mr-2">Показать:</label>
+                                            <select id="ready" name="ready" form="data" class="form-control">
+                                                <option value="" th:attr="selected = ${ready == ''} ? 'selected' : null">все...</option>
+                                                <option value="true" th:attr="selected = ${ready == 'true'} ? 'selected' : null">прочитанные</option>
+                                                <option value="false" th:attr="selected = ${ready == 'false'} ? 'selected' : null">не прочитанные</option>
+                                            </select>
+                                        </div>
+                                    </td>
+                                    <td>
+                                        <div class="input-group">
+                                            <label for="afterYear" class="col-form-label mr-2">изданные после:</label>
+                                            <input th:value="${year} ? ${year} : ''" form="data" class="form-control col-4"
+                                                   type="search" name="afterYear" id="afterYear" placeholder="год..." aria-label="Search"/>
+
+                                        </div>
+                                    </td>
+                                    <td>
+                                        <div class="input-group-prepend">
+                                            <button class="btn btn-outline-secondary" type="submit" form="data">
+                                                Применить
+                                            </button>
+                                        </div>
+                                    </td>
+                                </tr>
+                                <tr style="text-align: center">
+                                    <th:block th:if="${books.getTotalPages()} > 1">
+                                        <div th:include="fragments/pagination :: pagination(${books})" style="text-align: center;"></div>
+                                    </th:block>
+                                </tr>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </tr>
+    <tr>
+        <table>
+            <tbody>
+
+            </tbody>
+        </table>
+        <div class="row">
+            <!--/*@thymesVar id="book" type="ru.mail.zippospb.testTask.entity.Book"*/-->
+            <div class="col-md-3" th:each="book : ${books.getContent()}">
+                <div class="card mb-4 box-shadow-hover z-depth-1">
+                    <a th:href="@{/books/{id}(id = ${book.id})}">
+                        <table>
+                            <tbody>
+                            <tr>
+                                <td style="width: 15%">
+                                    <div class="card-img-crop">
+                                        <img th:if="${book.imageData != null}" class="card-img-top" th:src="@{/books/{id}/image(id = ${book.id})}" th:alt="${book.title}" />
+                                    </div>
+                                </td>
+                                <td>
+                                    <div class="card-footer d-flex justify-content-between">
+                                        <p th:text="${book.title}"></p>
+                                        <p th:text="${book.author}"></p>
+                                        <p class="text-muted" th:text="${book.printYear} + ' г.'"></p>
+                                        <span class="text-success" th:if="${book.readAlready}">
+                                            <svg class="navbar-nav-svg" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 12 16" version="1.1" aria-hidden="true" width="16" height="16">
+                                                <path fill-rule="evenodd" d="M12 5l-8 8-4-4 1.5-1.5L4 10l6.5-6.5z"></path>
+                                            </svg>
+                                            Прочитано
+                                        </span>
+                                    </div>
+                                </td>
+                            </tr>
+                            </tbody>
+                        </table>
+                    </a>
+                </div>
+            </div>
+        </div>
+    </tr>
+    </tbody>
+</table>
+</body>
+</html>
